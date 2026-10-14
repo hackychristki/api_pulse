@@ -1,0 +1,12 @@
+<% content_for :title, "Editing monitored api" %>
+
+<h1>Editing monitored api</h1>
+
+<%= render "form", monitored_api: @monitored_api %>
+
+<br>
+
+<div>
+  <%= link_to "Show this monitored api", @monitored_api %> |
+  <%= link_to "Back to monitored apis", monitored_apis_path %>
+</div>

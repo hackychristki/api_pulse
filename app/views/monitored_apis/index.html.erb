@@ -1,0 +1,16 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Monitored apis" %>
+
+<h1>Monitored apis</h1>
+
+<div id="monitored_apis">
+  <% @monitored_apis.each do |monitored_api| %>
+    <%= render monitored_api %>
+    <p>
+      <%= link_to "Show this monitored api", monitored_api %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New monitored api", new_monitored_api_path %>

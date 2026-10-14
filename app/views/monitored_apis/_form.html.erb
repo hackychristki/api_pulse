@@ -1,0 +1,32 @@
+<%= form_with(model: monitored_api) do |form| %>
+  <% if monitored_api.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(monitored_api.errors.count, "error") %> prohibited this monitored_api from being saved:</h2>
+
+      <ul>
+        <% monitored_api.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :name, style: "display: block" %>
+    <%= form.text_field :name %>
+  </div>
+
+  <div>
+    <%= form.label :url, style: "display: block" %>
+    <%= form.text_field :url %>
+  </div>
+
+  <div>
+    <%= form.label :expected_status, style: "display: block" %>
+    <%= form.number_field :expected_status %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

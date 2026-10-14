@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @monitored_api %>
+
+<div>
+  <%= link_to "Edit this monitored api", edit_monitored_api_path(@monitored_api) %> |
+  <%= link_to "Back to monitored apis", monitored_apis_path %>
+
+  <%= button_to "Destroy this monitored api", @monitored_api, method: :delete %>
+</div>
