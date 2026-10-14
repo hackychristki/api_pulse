@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  monitored_api: one
+  http_status: 1
+  response_time_ms: 1
+  checked_at: 2026-10-14 18:30:26
+  error_message: MyText
+  online: false
+
+two:
+  monitored_api: two
+  http_status: 1
+  response_time_ms: 1
+  checked_at: 2026-10-14 18:30:26
+  error_message: MyText
+  online: false
