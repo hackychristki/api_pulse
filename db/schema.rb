@@ -10,9 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_14_160449) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_14_163026) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "api_checks", force: :cascade do |t|
+    t.bigint "monitored_api_id", null: false
+    t.integer "http_status"
+    t.integer "response_time_ms"
+    t.datetime "checked_at", null: false
+    t.text "error_message"
+    t.boolean "online", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["monitored_api_id"], name: "index_api_checks_on_monitored_api_id"
+  end
 
   create_table "monitored_apis", force: :cascade do |t|
     t.string "name", null: false
@@ -21,4 +33,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_14_160449) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
+  add_foreign_key "api_checks", "monitored_apis"
 end
