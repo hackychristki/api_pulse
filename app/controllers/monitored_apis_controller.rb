@@ -1,18 +1,19 @@
 class MonitoredApisController < ApplicationController
-  before_action :set_monitored_api, only: %i[ show edit update destroy check]
+  before_action :set_monitored_api, only: %i[show edit update destroy check]
 
   # GET /monitored_apis or /monitored_apis.json
   def index
-    @monitored_apis = MonitoredApi.all
+    @monitored_apis = MonitoredApi.includes(:api_checks).order(:name)
   end
 
   # GET /monitored_apis/1 or /monitored_apis/1.json
   def show
-  @api_checks = @monitored_api.api_checks
-                              .order(checked_at: :desc)
-                              .limit(10)
+    @api_checks = @monitored_api.api_checks
+                                  .order(checked_at: :desc)
+                                  .limit(10)
 
-  @latest_check = @api_checks.first
+    @latest_check = @api_checks.first
+    @average_response_time_ms = @monitored_api.average_response_time_ms
   end
 
   # GET /monitored_apis/new
@@ -30,7 +31,7 @@ class MonitoredApisController < ApplicationController
 
     respond_to do |format|
       if @monitored_api.save
-        format.html { redirect_to @monitored_api, notice: "Monitored api was successfully created." }
+        format.html { redirect_to @monitored_api, notice: "API wurde erfolgreich hinzugefügt." }
         format.json { render :show, status: :created, location: @monitored_api }
       else
         format.html { render :new, status: :unprocessable_content }
@@ -43,7 +44,7 @@ class MonitoredApisController < ApplicationController
   def update
     respond_to do |format|
       if @monitored_api.update(monitored_api_params)
-        format.html { redirect_to @monitored_api, notice: "Monitored api was successfully updated.", status: :see_other }
+        format.html { redirect_to @monitored_api, notice: "API wurde erfolgreich aktualisiert.", status: :see_other }
         format.json { render :show, status: :ok, location: @monitored_api }
       else
         format.html { render :edit, status: :unprocessable_content }
@@ -57,7 +58,7 @@ class MonitoredApisController < ApplicationController
     @monitored_api.destroy!
 
     respond_to do |format|
-      format.html { redirect_to monitored_apis_path, notice: "Monitored api was successfully destroyed.", status: :see_other }
+      format.html { redirect_to monitored_apis_path, notice: "API wurde gelöscht.", status: :see_other }
       format.json { head :no_content }
     end
   end
@@ -67,10 +68,10 @@ class MonitoredApisController < ApplicationController
 
     if result.online?
       redirect_to @monitored_api,
-                  notice: "API successfully checked: online."
+                  notice: "Prüfung abgeschlossen: Die API ist online."
     else
       redirect_to @monitored_api,
-                  notice: "API checked: offline."
+                  alert: "Prüfung abgeschlossen: Die API ist offline."
     end
   end
 

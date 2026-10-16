@@ -28,6 +28,17 @@ class MonitoredApisControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "should check monitored_api" do
+    @monitored_api.update!(url: "http://127.0.0.1:1")
+
+    assert_difference("@monitored_api.api_checks.count", 1) do
+      post check_monitored_api_url(@monitored_api)
+    end
+
+    assert_redirected_to monitored_api_url(@monitored_api)
+    assert_equal "Prüfung abgeschlossen: Die API ist offline.", flash[:alert]
+  end
+
   test "should get edit" do
     get edit_monitored_api_url(@monitored_api)
     assert_response :success
