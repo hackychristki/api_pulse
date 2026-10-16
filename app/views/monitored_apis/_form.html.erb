@@ -1,7 +1,7 @@
-<%= form_with(model: monitored_api) do |form| %>
+<%= form_with(model: monitored_api, class: "api-form") do |form| %>
   <% if monitored_api.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(monitored_api.errors.count, "error") %> prohibited this monitored_api from being saved:</h2>
+    <div class="form-errors" role="alert">
+      <h2>Bitte korrigiere die folgenden Angaben:</h2>
 
       <ul>
         <% monitored_api.errors.each do |error| %>
@@ -11,22 +11,25 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :name, style: "display: block" %>
-    <%= form.text_field :name %>
+  <div class="form-field">
+    <%= form.label :name, "Name" %>
+    <%= form.text_field :name, required: true, autofocus: true, placeholder: "z. B. Payment API" %>
   </div>
 
-  <div>
-    <%= form.label :url, style: "display: block" %>
-    <%= form.text_field :url %>
+  <div class="form-field">
+    <%= form.label :url, "URL" %>
+    <%= form.url_field :url, required: true, placeholder: "https://httpbin.org/status/200" %>
+    <p class="field-hint">Die vollständige HTTP- oder HTTPS-Adresse, die geprüft werden soll.</p>
   </div>
 
-  <div>
-    <%= form.label :expected_status, style: "display: block" %>
-    <%= form.number_field :expected_status %>
+  <div class="form-field">
+    <%= form.label :expected_status, "Erwarteter HTTP-Status" %>
+    <%= form.number_field :expected_status, required: true, min: 100, max: 599 %>
+    <p class="field-hint">Meistens 200. Die API gilt als online, wenn genau dieser Status zurückkommt.</p>
   </div>
 
-  <div>
-    <%= form.submit %>
+  <div class="form-actions">
+    <%= link_to "Abbrechen", monitored_api.persisted? ? monitored_api_path(monitored_api) : monitored_apis_path, class: "button button-secondary" %>
+    <%= form.submit monitored_api.persisted? ? "Änderungen speichern" : "API hinzufügen", class: "button" %>
   </div>
 <% end %>

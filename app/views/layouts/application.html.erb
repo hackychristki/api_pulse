@@ -24,6 +24,34 @@
   </head>
 
   <body>
-    <%= yield %>
+    <header class="site-header">
+      <div class="container site-header__inner">
+        <%= link_to root_path, class: "brand" do %>
+          <span class="brand__mark" aria-hidden="true"></span>
+          <span>API Pulse</span>
+        <% end %>
+
+        <nav class="main-nav" aria-label="Hauptnavigation">
+          <%= link_to "Dashboard", root_path %>
+          <%= link_to "API hinzufügen", new_monitored_api_path, class: "button button-small" %>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container page-content">
+      <% if notice.present? %>
+        <div class="flash flash-notice" role="status"><%= notice %></div>
+      <% end %>
+
+      <% if alert.present? %>
+        <div class="flash flash-alert" role="alert"><%= alert %></div>
+      <% end %>
+
+      <%= yield %>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">API Pulse · Einfaches API-Monitoring mit Ruby on Rails</div>
+    </footer>
   </body>
 </html>

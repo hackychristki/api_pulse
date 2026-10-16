@@ -1,17 +1,14 @@
-<div id="<%= dom_id monitored_api %>">
+<dl id="<%= dom_id monitored_api %>" class="details-list">
   <div>
-    <strong>Name:</strong>
-    <%= monitored_api.name %>
+    <dt>Name</dt>
+    <dd><%= monitored_api.name %></dd>
   </div>
-
   <div>
-    <strong>Url:</strong>
-    <%= monitored_api.url %>
+    <dt>URL</dt>
+    <dd><%= link_to monitored_api.url, monitored_api.url, target: "_blank", rel: "noopener" %></dd>
   </div>
-
   <div>
-    <strong>Expected status:</strong>
-    <%= monitored_api.expected_status %>
+    <dt>Erwarteter Status</dt>
+    <dd><%= monitored_api.expected_status %></dd>
   </div>
-
-</div>
+</dl>

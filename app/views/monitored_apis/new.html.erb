@@ -1,11 +1,15 @@
-<% content_for :title, "New monitored api" %>
+<% content_for :title, "API hinzufügen · API Pulse" %>
 
-<h1>New monitored api</h1>
+<%= link_to "← Zurück zum Dashboard", monitored_apis_path, class: "back-link" %>
 
-<%= render "form", monitored_api: @monitored_api %>
+<div class="form-page">
+  <div>
+    <p class="eyebrow">Neue Überwachung</p>
+    <h1>API hinzufügen</h1>
+    <p class="page-lead">Lege fest, welche Adresse API Pulse prüfen soll.</p>
+  </div>
 
-<br>
-
-<div>
-  <%= link_to "Back to monitored apis", monitored_apis_path %>
+  <section class="panel">
+    <%= render "form", monitored_api: @monitored_api %>
+  </section>
 </div>

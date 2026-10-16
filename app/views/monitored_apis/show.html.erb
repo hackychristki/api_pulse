@@ -1,81 +1,117 @@
-<p style="color: green"><%= notice %></p>
+<% content_for :title, "#{@monitored_api.name} · API Pulse" %>
 
-<%= render @monitored_api %>
+<%= link_to "← Zurück zum Dashboard", monitored_apis_path, class: "back-link" %>
 
-<div>
-  <%= link_to "Edit this monitored api", edit_monitored_api_path(@monitored_api) %> |
-  <%= link_to "Back to monitored apis", monitored_apis_path %>
+<div class="page-header page-header-detail">
+  <div>
+    <p class="eyebrow">API-Details</p>
+    <div class="title-with-status">
+      <h1><%= @monitored_api.name %></h1>
+      <%= status_badge(@latest_check) %>
+    </div>
+    <p class="page-lead"><%= @monitored_api.url %></p>
+  </div>
 
-  <%= button_to "Destroy this monitored api", @monitored_api, method: :delete %>
+  <div class="page-actions">
+    <%= link_to "Bearbeiten", edit_monitored_api_path(@monitored_api), class: "button button-secondary" %>
+    <%= button_to "Jetzt prüfen", check_monitored_api_path(@monitored_api), method: :post, class: "button" %>
+  </div>
 </div>
 
-<%= button_to "Jetzt prüfen",
-              check_monitored_api_path(@monitored_api),
-              method: :post %>
+<section class="panel">
+  <div class="panel__header">
+    <div>
+      <p class="eyebrow">Live-Übersicht</p>
+      <h2>Aktueller Status</h2>
+    </div>
+    <span class="muted">Erwartet: HTTP <%= @monitored_api.expected_status %></span>
+  </div>
 
-<% if @latest_check.present? %>
-  <section>
-    <h2>Aktueller Status</h2>
-
-    <p>
-      <strong>Status:</strong>
-      <%= @latest_check.online? ? "Online" : "Offline" %>
-    </p>
-
-    <p>
-      <strong>HTTP-Status:</strong>
-      <%= @latest_check.http_status || "Keine Antwort" %>
-    </p>
-
-    <p>
-      <strong>Antwortzeit:</strong>
-      <%= @latest_check.response_time_ms || "Keine Messung" %> ms
-    </p>
-
-    <p>
-      <strong>Geprüft am:</strong>
-      <%= @latest_check.checked_at.in_time_zone.strftime("%d.%m.%Y %H:%M:%S") %>
-    </p>
+  <% if @latest_check.present? %>
+    <dl class="metrics-grid metrics-grid-large">
+      <div>
+        <dt>Status</dt>
+        <dd><%= status_badge(@latest_check) %></dd>
+      </div>
+      <div>
+        <dt>HTTP-Status</dt>
+        <dd><%= @latest_check.http_status || "Keine Antwort" %></dd>
+      </div>
+      <div>
+        <dt>Antwortzeit</dt>
+        <dd><%= formatted_response_time(@latest_check.response_time_ms) %></dd>
+      </div>
+      <div>
+        <dt>Durchschnitt</dt>
+        <dd><%= formatted_response_time(@average_response_time_ms) %></dd>
+      </div>
+      <div>
+        <dt>Zuletzt geprüft</dt>
+        <dd class="metric-time"><%= formatted_check_time(@latest_check) %></dd>
+      </div>
+    </dl>
 
     <% if @latest_check.error_message.present? %>
-      <p>
-        <strong>Fehler:</strong>
-        <%= @latest_check.error_message %>
-      </p>
+      <div class="error-message">
+        <strong>Fehlerdetails</strong>
+        <span><%= @latest_check.error_message %></span>
+      </div>
     <% end %>
-  </section>
-<% else %>
-  <p>Diese API wurde noch nicht geprüft.</p>
-<% end %>
+  <% else %>
+    <div class="empty-inline">
+      <p>Diese API wurde noch nicht geprüft.</p>
+      <%= button_to "Erste Prüfung starten", check_monitored_api_path(@monitored_api), method: :post, class: "button" %>
+    </div>
+  <% end %>
+</section>
 
-<% if @api_checks.any? %>
-  <h2>Letzte Prüfungen</h2>
+<section class="panel">
+  <div class="panel__header">
+    <div>
+      <p class="eyebrow">Historie</p>
+      <h2>Letzte Prüfungen</h2>
+    </div>
+    <span class="muted">Maximal 10 Einträge</span>
+  </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Zeitpunkt</th>
-        <th>Status</th>
-        <th>HTTP</th>
-        <th>Antwortzeit</th>
-        <th>Fehler</th>
-      </tr>
-    </thead>
+  <% if @api_checks.any? %>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Zeitpunkt</th>
+            <th>Status</th>
+            <th>HTTP</th>
+            <th>Antwortzeit</th>
+            <th>Fehler</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @api_checks.each do |api_check| %>
+            <tr>
+              <td><%= formatted_check_time(api_check) %></td>
+              <td><%= status_badge(api_check) %></td>
+              <td><%= api_check.http_status || "–" %></td>
+              <td><%= formatted_response_time(api_check.response_time_ms) %></td>
+              <td class="error-cell"><%= api_check.error_message.presence || "–" %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="muted">Noch keine Prüfungen vorhanden.</p>
+  <% end %>
+</section>
 
-    <tbody>
-      <% @api_checks.each do |api_check| %>
-        <tr>
-          <td>
-            <%= api_check.checked_at.in_time_zone.strftime("%d.%m.%Y %H:%M:%S") %>
-          </td>
-          <td><%= api_check.online? ? "Online" : "Offline" %></td>
-          <td><%= api_check.http_status || "–" %></td>
-          <td>
-            <%= api_check.response_time_ms ? "#{api_check.response_time_ms} ms" : "–" %>
-          </td>
-          <td><%= api_check.error_message.presence || "–" %></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-<% end %>
+<section class="panel settings-panel">
+  <div>
+    <p class="eyebrow">Konfiguration</p>
+    <h2>API-Einstellungen</h2>
+  </div>
+  <%= render @monitored_api %>
+  <div class="settings-actions">
+    <%= link_to "Einstellungen bearbeiten", edit_monitored_api_path(@monitored_api), class: "button button-secondary" %>
+    <%= button_to "API löschen", @monitored_api, method: :delete, class: "button button-danger", data: { turbo_confirm: "Diese API und alle Prüfergebnisse wirklich löschen?" } %>
+  </div>
+</section>

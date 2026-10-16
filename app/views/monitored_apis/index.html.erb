@@ -1,16 +1,65 @@
-<p style="color: green"><%= notice %></p>
+<% content_for :title, "Dashboard · API Pulse" %>
 
-<% content_for :title, "Monitored apis" %>
+<div class="page-header">
+  <div>
+    <p class="eyebrow">Übersicht</p>
+    <h1>API-Dashboard</h1>
+    <p class="page-lead">Verfügbarkeit und Antwortzeiten deiner überwachten Schnittstellen.</p>
+  </div>
 
-<h1>Monitored apis</h1>
-
-<div id="monitored_apis">
-  <% @monitored_apis.each do |monitored_api| %>
-    <%= render monitored_api %>
-    <p>
-      <%= link_to "Show this monitored api", monitored_api %>
-    </p>
-  <% end %>
+  <%= link_to "Neue API", new_monitored_api_path, class: "button" %>
 </div>
 
-<%= link_to "New monitored api", new_monitored_api_path %>
+<% if @monitored_apis.any? %>
+  <div class="dashboard-grid" id="monitored_apis">
+    <% @monitored_apis.each do |monitored_api| %>
+      <% latest_check = monitored_api.latest_check %>
+
+      <article class="api-card">
+        <div class="api-card__header">
+          <div>
+            <h2><%= link_to monitored_api.name, monitored_api %></h2>
+            <p class="api-url"><%= monitored_api.url %></p>
+          </div>
+
+          <%= status_badge(latest_check) %>
+        </div>
+
+        <dl class="metrics-grid">
+          <div>
+            <dt>Letzter HTTP-Status</dt>
+            <dd><%= latest_check&.http_status || "–" %></dd>
+          </div>
+          <div>
+            <dt>Letzte Antwortzeit</dt>
+            <dd><%= formatted_response_time(latest_check&.response_time_ms) %></dd>
+          </div>
+          <div>
+            <dt>Durchschnitt</dt>
+            <dd><%= formatted_response_time(monitored_api.average_response_time_ms) %></dd>
+          </div>
+          <div>
+            <dt>Zuletzt geprüft</dt>
+            <dd class="metric-time"><%= formatted_check_time(latest_check) %></dd>
+          </div>
+        </dl>
+
+        <% if latest_check&.error_message.present? %>
+          <p class="inline-error"><%= latest_check.error_message %></p>
+        <% end %>
+
+        <div class="card-actions">
+          <%= link_to "Details", monitored_api, class: "button button-secondary" %>
+          <%= button_to "Jetzt prüfen", check_monitored_api_path(monitored_api), method: :post, class: "button" %>
+        </div>
+      </article>
+    <% end %>
+  </div>
+<% else %>
+  <section class="empty-state">
+    <div class="empty-state__icon" aria-hidden="true">↗</div>
+    <h2>Noch keine API eingerichtet</h2>
+    <p>Füge deine erste Schnittstelle hinzu und starte die erste Verfügbarkeitsprüfung.</p>
+    <%= link_to "Erste API hinzufügen", new_monitored_api_path, class: "button" %>
+  </section>
+<% end %>
