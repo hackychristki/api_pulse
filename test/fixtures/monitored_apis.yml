@@ -1,11 +1,11 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  name: MyString
-  url: MyString
-  expected_status: 1
+  name: HTTPBin
+  url: https://httpbin.org/status/200
+  expected_status: 200
 
 two:
-  name: MyString
-  url: MyString
-  expected_status: 1
+  name: Example API
+  url: https://example.com
+  expected_status: 200

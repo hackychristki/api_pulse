@@ -2,16 +2,16 @@
 
 one:
   monitored_api: one
-  http_status: 1
-  response_time_ms: 1
+  http_status: 200
+  response_time_ms: 120
   checked_at: 2026-10-14 18:30:26
-  error_message: MyText
-  online: false
+  error_message:
+  online: true
 
 two:
   monitored_api: two
-  http_status: 1
-  response_time_ms: 1
+  http_status: 500
+  response_time_ms: 240
   checked_at: 2026-10-14 18:30:26
-  error_message: MyText
+  error_message: Expected HTTP 200, received 500
   online: false

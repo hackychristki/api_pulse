@@ -1,9 +1,20 @@
 require "net/http"
+require "openssl"
 require "uri"
 
 class ApiChecker
   OPEN_TIMEOUT = 5
   READ_TIMEOUT = 10
+  REQUEST_ERRORS = [
+    ArgumentError,
+    EOFError,
+    Net::HTTPBadResponse,
+    OpenSSL::SSL::SSLError,
+    SocketError,
+    SystemCallError,
+    Timeout::Error,
+    URI::InvalidURIError
+  ].freeze
 
   def initialize(monitored_api)
     @monitored_api = monitored_api
@@ -23,7 +34,7 @@ class ApiChecker
       online: online,
       error_message: error_message_for(status, online)
     )
-  rescue StandardError => error
+  rescue *REQUEST_ERRORS => error
     @monitored_api.api_checks.create!(
       response_time_ms: elapsed_ms_since(started_at),
       checked_at: Time.current,
