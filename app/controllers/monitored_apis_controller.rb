@@ -1,5 +1,5 @@
 class MonitoredApisController < ApplicationController
-  before_action :set_monitored_api, only: %i[ show edit update destroy ]
+  before_action :set_monitored_api, only: %i[ show edit update destroy check]
 
   # GET /monitored_apis or /monitored_apis.json
   def index
@@ -8,6 +8,11 @@ class MonitoredApisController < ApplicationController
 
   # GET /monitored_apis/1 or /monitored_apis/1.json
   def show
+  @api_checks = @monitored_api.api_checks
+                              .order(checked_at: :desc)
+                              .limit(10)
+
+  @latest_check = @api_checks.first
   end
 
   # GET /monitored_apis/new
@@ -54,6 +59,18 @@ class MonitoredApisController < ApplicationController
     respond_to do |format|
       format.html { redirect_to monitored_apis_path, notice: "Monitored api was successfully destroyed.", status: :see_other }
       format.json { head :no_content }
+    end
+  end
+
+  def check
+    result = ApiChecker.new(@monitored_api).call
+
+    if result.online?
+      redirect_to @monitored_api,
+                  notice: "API successfully checked: online."
+    else
+      redirect_to @monitored_api,
+                  notice: "API checked: offline."
     end
   end
 

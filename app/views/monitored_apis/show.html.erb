@@ -8,3 +8,74 @@
 
   <%= button_to "Destroy this monitored api", @monitored_api, method: :delete %>
 </div>
+
+<%= button_to "Jetzt prüfen",
+              check_monitored_api_path(@monitored_api),
+              method: :post %>
+
+<% if @latest_check.present? %>
+  <section>
+    <h2>Aktueller Status</h2>
+
+    <p>
+      <strong>Status:</strong>
+      <%= @latest_check.online? ? "Online" : "Offline" %>
+    </p>
+
+    <p>
+      <strong>HTTP-Status:</strong>
+      <%= @latest_check.http_status || "Keine Antwort" %>
+    </p>
+
+    <p>
+      <strong>Antwortzeit:</strong>
+      <%= @latest_check.response_time_ms || "Keine Messung" %> ms
+    </p>
+
+    <p>
+      <strong>Geprüft am:</strong>
+      <%= @latest_check.checked_at.in_time_zone.strftime("%d.%m.%Y %H:%M:%S") %>
+    </p>
+
+    <% if @latest_check.error_message.present? %>
+      <p>
+        <strong>Fehler:</strong>
+        <%= @latest_check.error_message %>
+      </p>
+    <% end %>
+  </section>
+<% else %>
+  <p>Diese API wurde noch nicht geprüft.</p>
+<% end %>
+
+<% if @api_checks.any? %>
+  <h2>Letzte Prüfungen</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Zeitpunkt</th>
+        <th>Status</th>
+        <th>HTTP</th>
+        <th>Antwortzeit</th>
+        <th>Fehler</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @api_checks.each do |api_check| %>
+        <tr>
+          <td>
+            <%= api_check.checked_at.in_time_zone.strftime("%d.%m.%Y %H:%M:%S") %>
+          </td>
+          <td><%= api_check.online? ? "Online" : "Offline" %></td>
+          <td><%= api_check.http_status || "–" %></td>
+          <td>
+            <%= api_check.response_time_ms ? "#{api_check.response_time_ms} ms" : "–" %>
+          </td>
+          <td><%= api_check.error_message.presence || "–" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
